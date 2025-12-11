@@ -22,6 +22,18 @@ public class SpiderPlayer : MonoBehaviour
     [SerializeField] TextMeshProUGUI distanceToLavaText;
     [SerializeField] GameObject endgamePanel;
     [SerializeField] TextMeshProUGUI maxHeightEndscreenText;
+    bool overloaded = false;
+    bool jetpackEquipped = false;
+    Coroutine overloadCoroutine = null;
+    Coroutine jetpackCoroutine = null;
+    [SerializeField] float velocityCap;
+    [SerializeField] float jetpackForce;
+    int jetpackInput = 0;
+    [SerializeField] GameObject brokenFX;
+    [SerializeField] Animator anthenaAnimatorL;
+    [SerializeField] Animator anthenaAnimatorR;
+    [SerializeField] Animator boosterAnimator;
+    [SerializeField] Animator faceAnimator;
 
     void Start()
     {
@@ -29,8 +41,20 @@ public class SpiderPlayer : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void FixedUpdate()
+    {
+        if (jetpackEquipped)
+        {
+            Vector2 jetpackDir = new Vector2(jetpackInput, 1);
+            rb.MovePosition(rb.position + jetpackDir * jetpackForce * Time.fixedDeltaTime);
+        }
+    }
     void Update()
     {
+        if (rb.velocity.magnitude > velocityCap) //cap velocity para no atravezar colliders
+        {
+            rb.velocity = rb.velocity.normalized * velocityCap;
+        }
         if ((int)transform.localPosition.y > maxHeight)
         {
             maxHeight = (int)transform.localPosition.y;
@@ -41,7 +65,22 @@ public class SpiderPlayer : MonoBehaviour
             stageGenerator.InstantiateStagePiece();
             nextHeightToSpawnNewStages += heightBetweenSpawnOfStages;
         }
-        if (stunned)
+        if (jetpackEquipped)
+        {
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Mouse0))
+            {
+                jetpackInput = -1;
+            }
+            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.Mouse1))
+            {
+                jetpackInput = 1;
+            }
+            else
+            {
+                jetpackInput = 0;
+            }
+        }
+        if (stunned || jetpackEquipped)
         {
             if (leftInstantiatedRope)
             {
@@ -60,7 +99,7 @@ public class SpiderPlayer : MonoBehaviour
                 Destroy(leftInstantiatedRope.gameObject);
             }
             leftInstantiatedRope = Instantiate(springRopePrefab, leftArm.position, Quaternion.identity);
-            leftInstantiatedRope.Initialize(leftArm.up, rb);
+            leftInstantiatedRope.Initialize(leftArm.up, rb, overloaded);
         }
         if (leftInstantiatedRope && (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Mouse0)))
         {
@@ -73,7 +112,7 @@ public class SpiderPlayer : MonoBehaviour
                 Destroy(rightInstantiatedRope.gameObject);
             }
             rightInstantiatedRope = Instantiate(springRopePrefab, rightArm.position, Quaternion.identity);
-            rightInstantiatedRope.Initialize(rightArm.up, rb);
+            rightInstantiatedRope.Initialize(rightArm.up, rb, overloaded);
         }
         if (rightInstantiatedRope && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.Mouse1)))
         {
@@ -100,8 +139,12 @@ public class SpiderPlayer : MonoBehaviour
 
     IEnumerator StunnedCooldown()
     {
+        brokenFX.SetActive(true);
+        faceAnimator.SetBool("Stunned", true);
         yield return new WaitForSeconds(stunTime);
         stunned = false;
+        brokenFX.SetActive(false);
+        faceAnimator.SetBool("Stunned", false);
         //stop stunned animation
     }
 
@@ -112,6 +155,7 @@ public class SpiderPlayer : MonoBehaviour
 
     IEnumerator TakeGameoverInput()
     {
+        yield return new WaitForSecondsRealtime(1.0f);
         while (true)
         {
             if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Mouse1))
@@ -120,6 +164,68 @@ public class SpiderPlayer : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    public void Overload(float activeTime)
+    {
+        if (overloaded)
+        {
+            StopCoroutine(overloadCoroutine);
+        }
+        else
+        { 
+            if (leftInstantiatedRope)
+            {
+                leftInstantiatedRope.EnableOverload();
+            }
+            if (rightInstantiatedRope)
+            {
+                rightInstantiatedRope.EnableOverload();
+            }
+        }
+        overloaded = true;
+        overloadCoroutine = StartCoroutine(DisableOverload(activeTime));
+    }
+
+    IEnumerator DisableOverload(float activeTime)
+    {
+        anthenaAnimatorL.SetBool("Boosted", true);
+        anthenaAnimatorR.SetBool("Boosted", true);
+        faceAnimator.SetBool("Overload", true);
+        yield return new WaitForSeconds(activeTime);
+        overloaded = false;
+        if (leftInstantiatedRope)
+        {
+            leftInstantiatedRope.DisableOverload();
+        }
+        if (rightInstantiatedRope)
+        {
+            rightInstantiatedRope.DisableOverload();
+        }
+        anthenaAnimatorL.SetBool("Boosted", false);
+        anthenaAnimatorR.SetBool("Boosted", false);
+        faceAnimator.SetBool("Overload", false);
+    }
+
+    public void EquipJetpack(float activeTime)
+    {
+        if (jetpackEquipped)
+        {
+            StopCoroutine(jetpackCoroutine);
+        }
+        jetpackEquipped = true;
+        jetpackCoroutine = StartCoroutine(DisableJetpack(activeTime));
+    }
+
+    IEnumerator DisableJetpack(float activeTime)
+    {
+        boosterAnimator.SetBool("Boosted", true);
+        faceAnimator.SetBool("Jetpack", true);
+        yield return new WaitForSeconds(activeTime);
+        jetpackEquipped = false;
+        rb.velocity = Vector2.zero;
+        boosterAnimator.SetBool("Boosted", false);
+        faceAnimator.SetBool("Jetpack", false);
     }
 
 }
