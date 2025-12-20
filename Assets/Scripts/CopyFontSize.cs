@@ -10,4 +10,9 @@ public class CopyFontSize : MonoBehaviour
         GetComponent<TextMeshProUGUI>().fontSize = textToCopyFont.fontSize;
     }
 
+    private void Update()
+    {
+        GetComponent<TextMeshProUGUI>().fontSize = textToCopyFont.fontSize;
+    }
+
 }

@@ -5,14 +5,26 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] Transform player;
-    float zOffset;
     [SerializeField] float lerpTValue;
+    [SerializeField] Vector3 offset;
+    [SerializeField] float smoothTime;
+    Vector3 velocity = Vector3.zero;
+
     private void Start()
     {
-        zOffset = transform.position.z;
+        if (CheckMobile.isMobile())
+        {
+            offset = new Vector3(0.0f, 0.0f, -30.0f);
+        }
+        else
+        {
+            offset = new Vector3(0.0f, 0.0f, transform.position.z);
+        }
     }
-    void Update()
+
+    private void FixedUpdate()
     {
-        transform.position = Vector3.Lerp(transform.position, new Vector3(player.position.x, player.position.y, zOffset), lerpTValue);
+        Vector3 desiredPos = player.position + offset;
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref velocity, smoothTime, 100, Time.fixedDeltaTime);
     }
 }

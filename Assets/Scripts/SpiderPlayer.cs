@@ -4,8 +4,12 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+
+
 public class SpiderPlayer : MonoBehaviour
 {
+     
+
     [SerializeField] Transform rightArm;
     [SerializeField] Transform leftArm;
     [SerializeField] SpringRope springRopePrefab;
@@ -34,11 +38,19 @@ public class SpiderPlayer : MonoBehaviour
     [SerializeField] Animator anthenaAnimatorR;
     [SerializeField] Animator boosterAnimator;
     [SerializeField] Animator faceAnimator;
+    bool isMobile = false;
+    bool mobileLeftDown = false;
+    bool mobileLeftUp = false;
+    bool mobileLeftHeld = false;
+    bool mobileRightDown = false;
+    bool mobileRightUp = false;
+    bool mobileRightHeld = false;
 
     void Start()
     {
         Time.timeScale = 1.0f;
         rb = GetComponent<Rigidbody2D>();
+        isMobile = CheckMobile.isMobile();
     }
 
     private void FixedUpdate()
@@ -67,11 +79,11 @@ public class SpiderPlayer : MonoBehaviour
         }
         if (jetpackEquipped)
         {
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Mouse0))
+            if ((!isMobile && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Mouse0))) || (isMobile && mobileLeftHeld))
             {
                 jetpackInput = -1;
             }
-            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.Mouse1))
+            else if ((!isMobile && Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.Mouse1)) || (isMobile && mobileRightHeld))
             {
                 jetpackInput = 1;
             }
@@ -92,7 +104,7 @@ public class SpiderPlayer : MonoBehaviour
             }
             return;
         }
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Mouse0))
+        if ((!isMobile && (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Mouse0))) || (isMobile && mobileLeftDown))
         {
             if (leftInstantiatedRope)
             {
@@ -101,11 +113,11 @@ public class SpiderPlayer : MonoBehaviour
             leftInstantiatedRope = Instantiate(springRopePrefab, leftArm.position, Quaternion.identity);
             leftInstantiatedRope.Initialize(leftArm.up, rb, overloaded);
         }
-        if (leftInstantiatedRope && (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Mouse0)))
+        if (leftInstantiatedRope && ((!isMobile && (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Mouse0))) || (isMobile && mobileLeftUp)))
         {
             Destroy(leftInstantiatedRope.gameObject);
         }
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Mouse1))
+        if ((!isMobile && (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Mouse1))) || (isMobile && mobileRightDown))
         {
             if (rightInstantiatedRope)
             {
@@ -114,10 +126,14 @@ public class SpiderPlayer : MonoBehaviour
             rightInstantiatedRope = Instantiate(springRopePrefab, rightArm.position, Quaternion.identity);
             rightInstantiatedRope.Initialize(rightArm.up, rb, overloaded);
         }
-        if (rightInstantiatedRope && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.Mouse1)))
+        if (rightInstantiatedRope && ((!isMobile && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.Mouse1))) || (isMobile && mobileRightUp)))
         {
             Destroy(rightInstantiatedRope.gameObject);
         }
+        mobileLeftDown = false;
+        mobileLeftUp = false;
+        mobileRightDown = false;
+        mobileRightUp = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -158,7 +174,7 @@ public class SpiderPlayer : MonoBehaviour
         yield return new WaitForSecondsRealtime(1.0f);
         while (true)
         {
-            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Mouse1))
+            if ((CheckMobile.isMobile() && Input.GetKeyDown(KeyCode.A)) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Mouse1))
             {
                 SceneManager.LoadScene("Gameplay");
             }
@@ -228,4 +244,24 @@ public class SpiderPlayer : MonoBehaviour
         faceAnimator.SetBool("Jetpack", false);
     }
 
+    public void MobileLeftButtonDown()
+    {
+        mobileLeftDown = true;
+        mobileLeftHeld = true;
+    }
+    public void MobileLeftButtonUp()
+    {
+        mobileLeftUp = true;
+        mobileLeftHeld = false;
+    }
+    public void MobileRightButtonDown()
+    {
+        mobileRightDown = true;
+        mobileRightHeld = true;
+    }
+    public void MobileRightButtonUp()
+    {
+        mobileRightUp = true;
+        mobileRightHeld = false;
+    }
 }
