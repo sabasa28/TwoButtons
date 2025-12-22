@@ -38,6 +38,8 @@ public class SpiderPlayer : MonoBehaviour
     [SerializeField] Animator anthenaAnimatorR;
     [SerializeField] Animator boosterAnimator;
     [SerializeField] Animator faceAnimator;
+    [SerializeField] Color ChristmasColorL;
+    [SerializeField] Color ChristmasColorR;
     bool isMobile = false;
     bool mobileLeftDown = false;
     bool mobileLeftUp = false;
@@ -112,6 +114,7 @@ public class SpiderPlayer : MonoBehaviour
             }
             leftInstantiatedRope = Instantiate(springRopePrefab, leftArm.position, Quaternion.identity);
             leftInstantiatedRope.Initialize(leftArm.up, rb, overloaded);
+            leftInstantiatedRope.SetRegularColor(ChristmasColorL);
         }
         if (leftInstantiatedRope && ((!isMobile && (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Mouse0))) || (isMobile && mobileLeftUp)))
         {
@@ -125,6 +128,7 @@ public class SpiderPlayer : MonoBehaviour
             }
             rightInstantiatedRope = Instantiate(springRopePrefab, rightArm.position, Quaternion.identity);
             rightInstantiatedRope.Initialize(rightArm.up, rb, overloaded);
+            rightInstantiatedRope.SetRegularColor(ChristmasColorR);
         }
         if (rightInstantiatedRope && ((!isMobile && (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.Mouse1))) || (isMobile && mobileRightUp)))
         {

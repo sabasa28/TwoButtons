@@ -130,4 +130,12 @@ public class SpringRope : MonoBehaviour
         }
     }
 
+    public void SetRegularColor(Color newColor)
+    {
+        regularColor = newColor;
+        if (!overloadedActive)
+        {
+            GetComponent<SpriteRenderer>().color = regularColor;
+        }
+    }
 }

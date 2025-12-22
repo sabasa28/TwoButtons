@@ -11988,6 +11988,38 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1795082038}
     - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorL.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorL.b
+      value: 0.0035154943
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorL.g
+      value: 0.745283
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorL.r
+      value: 0.13665329
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorR.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorR.b
+      value: 0.03137255
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorR.g
+      value: 0.03137255
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: ChristmasColorR.r
+      value: 0.77647066
+      objectReference: {fileID: 0}
+    - target: {fileID: 7305161885451378026, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
       propertyPath: distanceToLavaText
       value: 
       objectReference: {fileID: 329171556}
@@ -11995,6 +12027,10 @@ PrefabInstance:
       propertyPath: maxHeightEndscreenText
       value: 
       objectReference: {fileID: 1562349766}
+    - target: {fileID: 7305161885633569298, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.45
+      objectReference: {fileID: 0}
     - target: {fileID: 7305161886098061900, guid: 18f737eb9b3daae4c8d6a6b6f95c484c, type: 3}
       propertyPath: m_RootOrder
       value: 2
